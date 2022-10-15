@@ -17,6 +17,7 @@ You can also find test if the function when running the q1,q2,q3 files.
 ./q1
 ./q2
 ./q3
+./aes128_attack
 ```
 
 ## cleaning the project:
