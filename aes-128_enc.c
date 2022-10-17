@@ -118,7 +118,7 @@ void next_aes128_round_key(const uint8_t prev_key[16], uint8_t next_key[16], int
  * @round in {0...9}
  * The ``master decryption key'' is the 10-th round key (for a full AES-128)
  */
-void prev_aes128_round_key(const uint8_t next_key[16], uint8_t prev_key[16], int round)
+void prev_aes128_round_key(const uint8_t next_key[16], uint8_t prev_key[16], int round,const uint8_t Sbox[256])
 {
 	int i;
 	for (i = 15; i >= 4; i--)
