@@ -20,13 +20,13 @@ const uint8_t prev_key[AES_128_KEY_SIZE] = {
 
 	// prev_key is the master key because round = 0
 	printf("\nNext key\n");
-	next_aes128_round_key(prev_key, next_key, 0);
+	next_aes128_round_key(prev_key, next_key, 0,S);
 	block_output(next_key);
 
 	uint8_t prev_key_computed[AES_128_KEY_SIZE];
 
 	printf("\nPrev key\n");
-	prev_aes128_round_key(next_key, prev_key_computed, 0);
+	prev_aes128_round_key(next_key, prev_key_computed, 0,S);
 	block_output(prev_key_computed);
 
 	printf("\n");

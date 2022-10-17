@@ -9,7 +9,10 @@
  * Encrypt @block with @key over @nrounds. If @lastfull is true, the last round includes MixColumn, otherwise it doesn't.
  * @nrounds <= 10
  */
-void aes128_enc(uint8_t block[AES_BLOCK_SIZE], const uint8_t key[AES_128_KEY_SIZE], unsigned nrounds, int lastfull);
+void aes128_enc(uint8_t block[AES_BLOCK_SIZE], const uint8_t key[AES_128_KEY_SIZE], unsigned nrounds, int lastfull,uint8_t (*xtime)(uint8_t), const uint8_t Sbox[256]);
+
+uint8_t xtime(uint8_t p);
+uint8_t xtime_new(uint8_t p);
 
 /*
  * The AES S-box, duh
@@ -62,8 +65,8 @@ static const uint8_t Sinv[256] =
  * @round in {0...9}
  * The ``master decryption key'' is the 10-th round key (for a full AES-128)
  */
-void prev_aes128_round_key(const uint8_t next_key[16], uint8_t prev_key[16], int round);
+void prev_aes128_round_key(const uint8_t next_key[16], uint8_t prev_key[16], int round,const uint8_t Sbox[256]);
 
-void next_aes128_round_key(const uint8_t prev_key[16], uint8_t next_key[16], int round);
+void next_aes128_round_key(const uint8_t prev_key[16], uint8_t next_key[16], int round,const uint8_t Sbox[256]);
 
 #endif // __AES-128_ENC__H__

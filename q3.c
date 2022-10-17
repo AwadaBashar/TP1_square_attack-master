@@ -28,8 +28,8 @@ void aes3rounds_keyed_function (
         block_enc_k2[i] = block[i];
     }
 
-    aes128_enc(block_enc_k1, key1, 3, 1);
-    aes128_enc(block_enc_k2, key2, 3, 1);
+    aes128_enc(block_enc_k1, key1, 3, 1,xtime,S);
+    aes128_enc(block_enc_k2, key2, 3, 1,xtime,S);
 
     for (i = 0; i < AES_BLOCK_SIZE; ++i) {
         block[i] = block_enc_k1[i] ^ block_enc_k2[i];

@@ -4,7 +4,9 @@ version of the AES. This attack (taking the many names of “square”, “‘sa
 “integral” attack) is structural, in the sense that it does not depend on many details
 of the AES, but rather on its overall SPN structure.
 
-You can also find test if the function when running the q1,q2,q3 files.
+You can also find test of the function when running the q1,q2,q3 files.
+
+The attack is implemented and tested in the file "aes128_attack.c" Also after performing the attacks different test will run automatically in order to test the attack on different Sbox and different xtime function.
 
 ## Compilation:
 
@@ -17,7 +19,7 @@ You can also find test if the function when running the q1,q2,q3 files.
 ./q1
 ./q2
 ./q3
-./aes128_attack
+./aes128_attack (after running the program please provide a number for how many times you need to perform the attack)
 ```
 
 ## cleaning the project:

@@ -36,7 +36,7 @@ uint8_t xtime_new(uint8_t p)
  */
 static const uint8_t RC[10] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36};
 
-void aes_round(uint8_t block[AES_BLOCK_SIZE], uint8_t round_key[AES_BLOCK_SIZE], int lastround)
+void aes_round(uint8_t block[AES_BLOCK_SIZE], uint8_t round_key[AES_BLOCK_SIZE], int lastround,uint8_t (*xtime)(uint8_t), const uint8_t Sbox[256])
 {
 	int i;
 	uint8_t tmp;
@@ -45,29 +45,29 @@ void aes_round(uint8_t block[AES_BLOCK_SIZE], uint8_t round_key[AES_BLOCK_SIZE],
 	 * SubBytes + ShiftRow
 	 */
 	/* Row 0 */
-	block[ 0] = S[block[ 0]];
-	block[ 4] = S[block[ 4]];
-	block[ 8] = S[block[ 8]];
-	block[12] = S[block[12]];
+	block[ 0] = Sbox[block[ 0]];
+	block[ 4] = Sbox[block[ 4]];
+	block[ 8] = Sbox[block[ 8]];
+	block[12] = Sbox[block[12]];
 	/* Row 1 */
 	tmp = block[1];
-	block[ 1] = S[block[ 5]];
-	block[ 5] = S[block[ 9]];
-	block[ 9] = S[block[13]];
-	block[13] = S[tmp];
+	block[ 1] = Sbox[block[ 5]];
+	block[ 5] = Sbox[block[ 9]];
+	block[ 9] = Sbox[block[13]];
+	block[13] = Sbox[tmp];
 	/* Row 2 */
 	tmp = block[2];
-	block[ 2] = S[block[10]];
-	block[10] = S[tmp];
+	block[ 2] = Sbox[block[10]];
+	block[10] = Sbox[tmp];
 	tmp = block[6];
-	block[ 6] = S[block[14]];
-	block[14] = S[tmp];
+	block[ 6] = Sbox[block[14]];
+	block[14] = Sbox[tmp];
 	/* Row 3 */
 	tmp = block[15];
-	block[15] = S[block[11]];
-	block[11] = S[block[ 7]];
-	block[ 7] = S[block[ 3]];
-	block[ 3] = S[tmp];
+	block[15] = Sbox[block[11]];
+	block[11] = Sbox[block[ 7]];
+	block[ 7] = Sbox[block[ 3]];
+	block[ 3] = Sbox[tmp];
 
 	/*
 	 * MixColumns
@@ -78,10 +78,10 @@ void aes_round(uint8_t block[AES_BLOCK_SIZE], uint8_t round_key[AES_BLOCK_SIZE],
 		uint8_t tmp2 = column[0];
 		tmp = column[0] ^ column[1] ^ column[2] ^ column[3];
 
-		column[0] ^= tmp ^ xtime(column[0] ^ column[1]);
-		column[1] ^= tmp ^ xtime(column[1] ^ column[2]);
-		column[2] ^= tmp ^ xtime(column[2] ^ column[3]);
-		column[3] ^= tmp ^ xtime(column[3] ^ tmp2);
+		column[0] ^= tmp ^ (*xtime)(column[0] ^ column[1]);
+		column[1] ^= tmp ^ (*xtime)(column[1] ^ column[2]);
+		column[2] ^= tmp ^ (*xtime)(column[2] ^ column[3]);
+		column[3] ^= tmp ^ (*xtime)(column[3] ^ tmp2);
 	}
 
 	/*
@@ -98,14 +98,14 @@ void aes_round(uint8_t block[AES_BLOCK_SIZE], uint8_t round_key[AES_BLOCK_SIZE],
  * @round in {0...9}
  * The ``master key'' is the 0-th round key 
  */
-void next_aes128_round_key(const uint8_t prev_key[16], uint8_t next_key[16], int round)
+void next_aes128_round_key(const uint8_t prev_key[16], uint8_t next_key[16], int round,const uint8_t Sbox[256])
 {
 	int i;
 
-	next_key[0] = prev_key[0] ^ S[prev_key[13]] ^ RC[round];
-	next_key[1] = prev_key[1] ^ S[prev_key[14]];
-	next_key[2] = prev_key[2] ^ S[prev_key[15]];
-	next_key[3] = prev_key[3] ^ S[prev_key[12]];
+	next_key[0] = prev_key[0] ^ Sbox[prev_key[13]] ^ RC[round];
+	next_key[1] = prev_key[1] ^ Sbox[prev_key[14]];
+	next_key[2] = prev_key[2] ^ Sbox[prev_key[15]];
+	next_key[3] = prev_key[3] ^ Sbox[prev_key[12]];
 
 	for (i = 4; i < 16; i++)
 	{
@@ -130,17 +130,17 @@ void prev_aes128_round_key(const uint8_t next_key[16], uint8_t prev_key[16], int
 	//{
 	//	prev_key[i] = next_key[i] ^ next_key[i - 4];
 	//}
-	prev_key[0] = next_key[0] ^ S[prev_key[13]] ^ RC[round];
-	prev_key[1] = next_key[1] ^ S[prev_key[14]];
-	prev_key[2] = next_key[2] ^ S[prev_key[15]];
-	prev_key[3] = next_key[3] ^ S[prev_key[12]];
+	prev_key[0] = next_key[0] ^ Sbox[prev_key[13]] ^ RC[round];
+	prev_key[1] = next_key[1] ^ Sbox[prev_key[14]];
+	prev_key[2] = next_key[2] ^ Sbox[prev_key[15]];
+	prev_key[3] = next_key[3] ^ Sbox[prev_key[12]];
 }
 
 /*
  * Encrypt @block with @key over @nrounds. If @lastfull is true, the last round includes MixColumn, otherwise it doesn't.
  * @nrounds <= 10
  */
-void aes128_enc(uint8_t block[AES_BLOCK_SIZE], const uint8_t key[AES_128_KEY_SIZE], unsigned nrounds, int lastfull)
+void aes128_enc(uint8_t block[AES_BLOCK_SIZE], const uint8_t key[AES_128_KEY_SIZE], unsigned nrounds, int lastfull,uint8_t (*xtime)(uint8_t), const uint8_t Sbox[256])
 {
 	uint8_t ekey[32];
 	int i, pk, nk;
@@ -150,23 +150,23 @@ void aes128_enc(uint8_t block[AES_BLOCK_SIZE], const uint8_t key[AES_128_KEY_SIZ
 		block[i] ^= key[i];
 		ekey[i]   = key[i];
 	}
-	next_aes128_round_key(ekey, ekey + 16, 0);
+	next_aes128_round_key(ekey, ekey + 16, 0,Sbox);
 
 	pk = 0;
 	nk = 16;
 	for (i = 1; i < nrounds; i++)
 	{
-		aes_round(block, ekey + nk, 0);
+		aes_round(block, ekey + nk, 0,(*xtime),Sbox);
 		pk = (pk + 16) & 0x10;
 		nk = (nk + 16) & 0x10;
-		next_aes128_round_key(ekey + pk, ekey + nk, i);
+		next_aes128_round_key(ekey + pk, ekey + nk, i,Sbox);
 	}
 	if (lastfull)
 	{
-		aes_round(block, ekey + nk, 0);
+		aes_round(block, ekey + nk, 0,(*xtime),Sbox);
 	}
 	else
 	{
-		aes_round(block, ekey + nk, 16);
+		aes_round(block, ekey + nk, 16,(*xtime),Sbox);
 	}
 }
