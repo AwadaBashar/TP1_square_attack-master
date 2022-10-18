@@ -19,7 +19,7 @@ The attack is implemented and tested in the file "aes128_attack.c" Also after pe
 ./q1
 ./q2
 ./q3
-./aes128_attack (after running the program please provide a number for how many times you need to perform the attack)
+./aes128_attack (after running the program please provide a number for how many times you need to perform the attack and automatic tests will run after performing the attack)
 ```
 
 ## cleaning the project:

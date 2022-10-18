@@ -7,6 +7,7 @@
 
 #define NUMBER_OF_TRIALS 20
 
+// used in order to print the key
 void vector_print(uint8_t *v, int n)
 {
     int i;
@@ -92,8 +93,8 @@ void generate_lambda_set(uint8_t set[256][AES_BLOCK_SIZE], uint8_t c)
 }
 
 /**
- * Computes a possible 4th round key and puts in @ key_res 
- * the function akes an encrypted lambda-set @ set_encrypted and the set that we save in ot key_res
+ * Computes a possible 4th round key and puts in @key_res 
+ * the function akes an encrypted lambda-set @set_encrypted and the set that we save in ot key_res
  * the computation may lead to false positive
 */
 void compute_possible_key(uint8_t set_encrypted[256][AES_BLOCK_SIZE], uint8_t key_res[AES_128_KEY_SIZE],const uint8_t Sbox_inv[256])
@@ -178,7 +179,6 @@ int attack(uint8_t (*xtime)(uint8_t), const uint8_t Sbox[256],const uint8_t Sbox
         compute_possible_key(set, poss_keys[i],Sbox_inv);
     }
 
-    printf("%d Delta sets were encrypted,\n%d possible keys were computed.\n", NUMBER_OF_TRIALS, NUMBER_OF_TRIALS);
     printf("Will now try to know the actual master key !!!\n");
     nk = 0;
     pk = 16;
